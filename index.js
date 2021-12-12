@@ -44,8 +44,7 @@
     }
 
     function configure () {
-        const popupUrl = './horizontalRadioButtonConfig.html';
-        tableau.extensions.ui.displayDialogAsync(popupUrl, selectedParameterName, { height: 500, width: 500 }).then((closePayload) => {
+        tableau.extensions.ui.displayDialogAsync('./config.html', selectedParameterName).then((closePayload) => {
 
         }).catch((error) => {
             switch (error.errorCode) {
