@@ -10,7 +10,7 @@
 
             tableau.extensions.dashboardContent.dashboard.getParametersAsync().then(function (parameters) {
                 parameters.forEach(function (parameter) {
-                    if (parameter.allowableValues.type ===  tableau.ParameterValueType.List) {
+                    if (parameter.allowableValues.type === tableau.ParameterValueType.List) {
                         const listElement = $('<h3>')
 
                         $('<input />', {
