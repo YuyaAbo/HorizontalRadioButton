@@ -4,6 +4,7 @@
     $(document).ready(function () {
         tableau.extensions.initializeAsync({'configure': configure}).then(function () {
             tableau.extensions.settings.addEventListener(tableau.TableauEventType.SettingsChanged, updateSetting)
+            selectedParameterName = tableau.extensions.settings.get('selectedParameterNameKey')
             updateRadioButton()
         })
     })
