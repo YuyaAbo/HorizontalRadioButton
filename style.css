@@ -36,7 +36,6 @@ input[type=radio] + label::after {
     left: 3px;
     top: 3px;
     opacity: 0;
-    transition: .3s;
 }
 
 input[type=radio]:checked + label::after {
