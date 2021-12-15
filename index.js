@@ -1,46 +1,52 @@
 (function () {
     let selectedParameterName = ''
 
-    $(document).ready(function () {
-        tableau.extensions.initializeAsync({'configure': configure}).then(function () {
-            tableau.extensions.settings.addEventListener(tableau.TableauEventType.SettingsChanged, updateSetting)
+    $(document).ready(() => {
+        tableau.extensions.initializeAsync({'configure': configure}).then(() => {
+            tableau.extensions.settings.addEventListener(tableau.TableauEventType.SettingsChanged, onSettingsChange)
             selectedParameterName = tableau.extensions.settings.get('selectedParameterNameKey')
-            updateRadioButton()
+            initRadioButton()
         })
     })
 
-    function updateSetting (setting) {
-        selectedParameterName = setting.newSettings.selectedParameterNameKey
-        updateRadioButton()
+    const onSettingsChange =  (settingsEvent) => {
+        selectedParameterName = settingsEvent.newSettings.selectedParameterNameKey
+        initRadioButton()
     }
 
-    function updateRadioButton () {
-        tableau.extensions.dashboardContent.dashboard.getParametersAsync().then(function (parameters) {
-            parameters.forEach(function (p) {
-                if (p.name === selectedParameterName) {
-                    const parameterValuesElement = $('<div id="parameter">')
-                    p.allowableValues.allowableValues.forEach(function (value) {
-                        const eachValueElement = $('<div style="display: inline-block">')
+    const onParameterChange = (parameterChangeEvent) => {
+        parameterChangeEvent.getParameterAsync().then((parameter) => {
+            $(`input:radio[value=${parameter.currentValue.formattedValue}]`)
+                .prop('checked', true)
+        })
+    }
 
-                        $('<input />', {
-                            type: 'radio',
-                            id: value.formattedValue,
-                            name: p.name,
-                            value: value.formattedValue,
-                            checked: value.formattedValue === p.currentValue.formattedValue,
-                            click: () => p.changeValueAsync(value.formattedValue),
-                        }).appendTo(eachValueElement)
+    const initRadioButton = () => {
+        tableau.extensions.dashboardContent.dashboard.getParametersAsync().then((parameters) => {
+            const selectedParameter = parameters.find((p) => p.name === selectedParameterName)
+            selectedParameter.addEventListener(tableau.TableauEventType.ParameterChanged, onParameterChange)
 
-                        $('<label>', {
-                            'for': value.formattedValue,
-                            text: value.formattedValue,
-                        }).appendTo(eachValueElement)
+            const parameterValuesElement = $('<div id="parameter">')
+            selectedParameter.allowableValues.allowableValues.forEach((dataValue) => {
+                const eachValueElement = $('<div style="display: inline-block">')
 
-                        parameterValuesElement.append(eachValueElement)
-                    })
-                    $('#parameter').replaceWith(parameterValuesElement)
-                }
+                $('<input />', {
+                    type: 'radio',
+                    id: dataValue.formattedValue,
+                    name: selectedParameter.name,
+                    value: dataValue.formattedValue,
+                    checked: dataValue.formattedValue === selectedParameter.currentValue.formattedValue,
+                    click: () => selectedParameter.changeValueAsync(dataValue.formattedValue),
+                }).appendTo(eachValueElement)
+
+                $('<label>', {
+                    'for': dataValue.formattedValue,
+                    text: dataValue.formattedValue,
+                }).appendTo(eachValueElement)
+
+                parameterValuesElement.append(eachValueElement)
             })
+            $('#parameter').replaceWith(parameterValuesElement)
         })
     }
 
