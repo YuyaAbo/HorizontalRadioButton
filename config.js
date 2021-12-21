@@ -1,47 +1,47 @@
 (function () {
-    tableau.extensions.initializeDialogAsync().then(() => {
-        $("#closeButton").click(closeDialog);
+    const SELECTED_PARAMETER_NAME_KEY = 'selectedParameterNameKey'
+    let selectedParameterName = ''
 
-        const savedParameterName = tableau.extensions.settings.get(
-            "selectedParameterNameKey"
-        );
+    $(document).ready(function () {
+        tableau.extensions.initializeDialogAsync().then(function (openPayload) {
+            $('#closeButton').click(closeDialog)
 
-        tableau.extensions.dashboardContent.dashboard
-            .getParametersAsync()
-            .then(function (parameters) {
+            selectedParameterName = tableau.extensions.settings.get(SELECTED_PARAMETER_NAME_KEY)
+
+            tableau.extensions.dashboardContent.dashboard.getParametersAsync().then(function (parameters) {
                 parameters.forEach(function (parameter) {
-                    if (
-                        parameter.allowableValues.type === tableau.ParameterValueType.List
-                    ) {
-                        const listElement = $("<h3>");
+                    if (parameter.allowableValues.type === tableau.ParameterValueType.List) {
+                        const listElement = $('<h3>')
 
-                        $("<input />", {
-                            type: "radio",
+                        $('<input />', {
+                            type: 'radio',
                             id: parameter.name,
-                            name: "HorizontalRadioButtonConfig",
+                            name: 'HorizontalRadioButtonConfig',
                             value: parameter.name,
-                            checked: parameter.name === savedParameterName,
-                        }).appendTo(listElement);
+                            checked: parameter.name === selectedParameterName,
+                            click: function () { updateTargetParameter(parameter.name); },
+                        }).appendTo(listElement)
 
-                        $("<label>", {
-                            for: parameter.name,
+                        $('<label>', {
+                            'for': parameter.name,
                             text: parameter.name,
-                        }).appendTo(listElement);
+                        }).appendTo(listElement)
 
-                        $("#parameters").append(listElement);
+                        $('#parameters').append(listElement)
                     }
-                });
-            });
-    });
+                })
+            })
+        })
+    })
 
-    const closeDialog = () => {
-        const selectedParameterName = $(`input:radio:checked`).val();
-        tableau.extensions.settings.set(
-            "selectedParameterNameKey",
-            selectedParameterName
-        );
+    function updateTargetParameter (parameterName) {
+        selectedParameterName = parameterName
+    }
+
+    function closeDialog () {
+        tableau.extensions.settings.set(SELECTED_PARAMETER_NAME_KEY, selectedParameterName)
         tableau.extensions.settings.saveAsync().then(() => {
-            tableau.extensions.ui.closeDialog("");
-        });
-    };
-})();
+            tableau.extensions.ui.closeDialog(selectedParameterName)
+        })
+    }
+})()
