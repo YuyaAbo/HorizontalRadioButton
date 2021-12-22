@@ -15,7 +15,7 @@
 
     const onParameterChange = (parameterChangeEvent) => {
         parameterChangeEvent.getParameterAsync().then((parameter) => {
-            $(`input:radio[value=${parameter.currentValue.formattedValue}]`).prop(
+            $(`input:radio[value="${parameter.currentValue.formattedValue}"]`).prop(
                 "checked",
                 true
             );
