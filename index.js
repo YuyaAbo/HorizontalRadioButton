@@ -1,12 +1,14 @@
 (function () {
-    $(document).ready(() => {
-        tableau.extensions.initializeAsync({ configure: configure }).then(() => {
-            tableau.extensions.settings.addEventListener(
-                tableau.TableauEventType.SettingsChanged,
-                onSettingsChange
-            );
-            initRadioButton();
-        });
+    const configure = () => {
+        tableau.extensions.ui.displayDialogAsync("./config.html", "");
+    };
+
+    tableau.extensions.initializeAsync({ configure: configure }).then(() => {
+        tableau.extensions.settings.addEventListener(
+            tableau.TableauEventType.SettingsChanged,
+            onSettingsChange
+        );
+        initRadioButton();
     });
 
     const onSettingsChange = () => {
@@ -64,9 +66,5 @@
                 );
                 $("#parameter").replaceWith(parameterValuesElement);
             });
-    };
-
-    const configure = () => {
-        tableau.extensions.ui.displayDialogAsync("./config.html", "");
     };
 })();
